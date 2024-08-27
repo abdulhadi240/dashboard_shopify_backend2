@@ -7,7 +7,7 @@ app = FastAPI(
     version="1.0.0",
     servers=[
         {
-            "url": "https://dashboard-shopify-backend.onrender.com",
+            "url": "https://dashboard-shopify-backend2.onrender.com",
             "description": "Shopify API"
         }
         
@@ -22,6 +22,7 @@ async def get_shopify_orders():
     try:
         response = requests.get(url)
         response.raise_for_status()  # Raises an exception for 4XX/5XX responses
+        print(response.json())
         return response.json()  # Return the JSON response from Shopify
     except requests.exceptions.HTTPError as http_err:
         raise HTTPException(status_code=response.status_code, detail=str(http_err))
