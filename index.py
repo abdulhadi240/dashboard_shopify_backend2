@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import requests
-from typing import List, Optional
+from typing import List, Optional, Union
 
 # Pydantic models for response
 
@@ -50,17 +50,18 @@ async def get_shopify_orders():
         response = requests.get(url)
         response.raise_for_status()  # Raises an exception for 4XX/5XX responses
 
-        # Ensure the response is a list of orders
-        orders = response.json()
+        # Get the response data
+        data = response.json()
+
+        # Extract the orders list from the response
+        orders = data.get("orders", [])
+
         if not isinstance(orders, list):
-            raise HTTPException(status_code=500, detail="Unexpected response format: not a list")
+            raise HTTPException(status_code=500, detail="Unexpected response format: 'orders' is not a list")
 
         # Filter the orders to include only the specified fields
         filtered_orders = []
         for order in orders:
-            if not isinstance(order, dict):
-                raise HTTPException(status_code=500, detail="Unexpected response format: order is not a dictionary")
-            
             # Extract relevant note attributes
             note_attributes = {item["name"]: item["value"] for item in order.get("note_attributes", [])}
             
